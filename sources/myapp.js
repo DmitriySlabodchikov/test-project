@@ -6,10 +6,12 @@ webix.protoUI({
 },webix.ui.list,webix.ActiveContent);
 
 webix.ready(() => {
+	webix.i18n.parseFormat = "%d-%m-%Y";
+	webix.i18n.setLocale();
 	var app = new JetApp({
 		id:			APPNAME,
 		version:	VERSION,
-		start:		"/top/contacts/subviews_contacts.contact_info:id=1",
+		start:		"/top/contacts",
 		debug:true
 	});
 	app.render();

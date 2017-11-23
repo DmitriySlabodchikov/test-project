@@ -21,9 +21,10 @@ export default class ContactList extends JetView{
 			select:true,
 			on:{
 				"onSelectChange":(id) => {
-					this.show("./subviews_contacts.contact_info?id="+id);
+					this.show("subviews_contacts.contact_info?id="+id);
 				}
 			}
+				
 		};
 
 		return {cols:[contact,{ $subview:true }]};
@@ -31,7 +32,16 @@ export default class ContactList extends JetView{
 	}
 
 	init(view){
-		view.queryView({view:"list"}).parse(getUsers());
+		var list = view.queryView({view:"list"});
+		list.parse(getUsers());
+
+		getUsers().waitData.then(function(){
+			
+				list.select(list.getFirstId());
+			
+		});
+		
+		
 	}
 
 }

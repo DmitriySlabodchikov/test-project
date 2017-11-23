@@ -4,7 +4,7 @@ import {getUser} from "models/users";
 export default class ContactForm extends JetView{
 
 	config(){
-
+		var count = 0;
 		var user = {
 			view:"template",borderless: true,
 
@@ -14,51 +14,38 @@ export default class ContactForm extends JetView{
 				"<div class='info_user'><div  style='background:grey; height:160px;'></div><p class='center'>Status: "+item.StatusID+"</p></div>"+
 				"<div class='info_user'>";
 
-				var count = 0;
-
+				
 				function addDiv(){
 					if(count===4){
 						info+= "</div><div class='info_user'>";
 					}
 					count++;
 				}
-
-				if(item.Email){
-					addDiv();
-					info+= "<span class ='icons webix_icon fa-envelope'></span>"+item.Email+"<br>";					
+				function addInfo(icon,value){
+					if(value){
+						addDiv();
+						info+= "<span class ='icons webix_icon fa-"+icon+"'></span>"+value+"<br>";					
+					}
 				}
 
-				if(item.Skype){
-					addDiv();
-					info+= "<span class ='icons webix_icon fa-skype'></span>"+item.Skype+"<br>";
-				}
 
-				if(item.Job){
-					addDiv();
-					info+= "<span class ='icons webix_icon fa-tag'></span>"+item.Job+"<br>";
-				}
+				addInfo("envelope",item.Email);
 
-				if(item.Company){
-					addDiv();					
-					info+= "<span class ='icons webix_icon fa-briefcase'></span>"+item.Company+"<br>";
-				}
+				addInfo("skype",item.Skype);
 
-				if(item.Birthday){
-					addDiv();
-					info+= "<span class ='icons webix_icon fa-calendar'></span>"+item.Birthday+"<br>";				
-				}
+				addInfo("tag",item.Job);
 
-				if(item.Address){
-					addDiv();
-					info+= "<span class ='icons webix_icon fa-map-marker'></span>"+item.Address+"<br>";
-				}
+				addInfo("briefcase",item.Company);
+
+				addInfo("calendar",item.Birthday);
+
+				addInfo("map-marker",item.Address);
+
 
 				info+= "</div>";
 
 				return info;
 			}
-
-		
 
 		};
 
@@ -74,16 +61,14 @@ export default class ContactForm extends JetView{
 			user,
 			{rows:[userButtons,{}]}
 		]};
+
 	}
 	
 	urlChange(view, url){
 		if(url[0].params.id){
 			var id  = url[0].params.id;
-			view.queryView({view:"template"}).parse( getUser(id) );
+			view.queryView({view: "template"}).parse( getUser(id) );
 		}
 	}	
 	
 }
-
-
-

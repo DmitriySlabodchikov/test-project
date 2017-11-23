@@ -2,15 +2,15 @@ import {JetView} from "webix-jet";
 
 
 export default class Settings extends JetView{
-	
-	config(){	
+
+	config(){
 
 		var settingsForm = {
 			view: "form",
 			id: "settingsForm",
-			borderless:true,
-			elements:[
-				{ view:"select", label:"Language", options:["English", "Русский"] },
+			borderless: true,
+			elements: [
+				{view: "select", label: "Language", options: ["English", "Русский"]},
 				{}
 			]};
 
@@ -18,4 +18,3 @@ export default class Settings extends JetView{
 	}
 
 }
-
