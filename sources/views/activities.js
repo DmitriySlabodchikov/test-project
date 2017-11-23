@@ -1,7 +1,7 @@
 import {JetView} from "webix-jet";
 import {getActivities} from "models/activities";
 import {getOptionsUsers} from "models/users";
-import {getOptionTypes} from "models/types";
+import {getOptionsTypes} from "models/types";
 import ActivitiesButton from "views/subviews_activities/add_activity_button";
 import {openWin} from "views/subviews_activities/activity_form";
 
@@ -10,8 +10,12 @@ export default class ActivitiesTable extends JetView{
 	config(){
 
 		getOptionsUsers().then( function (opts){
-			debugger
 			$$("f").getColumnConfig("ContactID").collection = opts;
+			$$("f").refreshColumns();
+		});
+
+		getOptionsTypes().then( function (opts){
+			$$("f").getColumnConfig("TypeID").collection = opts;
 			$$("f").refreshColumns();
 		});
 
