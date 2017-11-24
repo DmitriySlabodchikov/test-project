@@ -1,6 +1,6 @@
 import {JetView} from "webix-jet";
-import {getTypes} from "models/types";
-import {getUsers} from "models/users";
+import {types} from "models/types";
+import {users} from "models/users";
 import {setActivities, getActivity} from "models/activities";
 
 
@@ -19,7 +19,7 @@ export default class SaveActivity extends JetView{
 					label: "Type",
 					name: "TypeID",
 					options: {
-						data: getTypes(),
+						data: types,
 						body: {
 							template: "#Value#"
 						}
@@ -30,7 +30,7 @@ export default class SaveActivity extends JetView{
 					label: "Contact",
 					name: "ContactID",
 					options: {
-						data: getUsers(),
+						data: users,
 						body: {
 							template: "#FirstName# #LastName# #Email#"
 						}
@@ -42,7 +42,9 @@ export default class SaveActivity extends JetView{
 
 				{cols: [
 					{view: "button", type: "iconButton", icon: "plus", label: "Add (*save)", click: saveForm},
-					{view: "button", type: "iconButton", icon: "edit", label: "Cancel", click: closeWin}
+					{view: "button", type: "iconButton", icon: "edit", label: "Cancel", click: function(){
+						this.getTopParentView().hide();
+					}}
 				]}
 			],
 			rules: {
@@ -68,20 +70,19 @@ export default class SaveActivity extends JetView{
 		this.getRoot().show();
 		if (id) {
 			$$("activityForm").setValues(getActivity(id));
+		}else{
+			$$("activityForm").clear();
 		}
 	}
 
 }
 
-function closeWin() {
-	this.getTopParentView().hide();
-}
 
 function saveForm() {
 	if ($$("activityForm").validate()) {
 		webix.message("Data entered correctly");
 		const takenData = $$("activityForm").getValues();
 		setActivities(takenData.id, takenData);
-		closeWin();
+		this.getTopParentView().hide();
 	}
 }

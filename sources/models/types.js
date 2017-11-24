@@ -1,9 +1,7 @@
-const types = new webix.DataCollection({
+export const types = new webix.DataCollection({
 	url: "http://localhost:8096/api/v1/activitytypes/",
 	save: "rest->http://localhost:8096/api/v1/activitytypes/"
 });
-
-export function getTypes(){return types;}
 
 export function getType(id){return types.getItem(id);}
 

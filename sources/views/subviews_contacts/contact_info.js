@@ -1,6 +1,6 @@
 import {JetView} from "webix-jet";
-import {getUser, users} from "models/users";
-import {getStatus, statuses} from "models/statuses";
+import {users} from "models/users";
+import {statuses} from "models/statuses";
 
 export default class ContactForm extends JetView{
 
