@@ -1,5 +1,5 @@
 import {JetView} from "webix-jet";
-import {getUsers} from "models/users";
+import {users} from "models/users";
 
 export default class ContactList extends JetView{
 
@@ -11,7 +11,7 @@ export default class ContactList extends JetView{
 			template:"<span class ='webix_icon fa-user-circle'></span> <b>#FirstName# #LastName#</b><span class ='webix_icon fa-close'></span><br> Email: #Email#",
 			onClick:{
 				"fa-close":(ev, id) => {
-					getUsers().remove(id);
+					users.remove(id);
 				}
 			},
 			type:{
@@ -27,21 +27,17 @@ export default class ContactList extends JetView{
 				
 		};
 
-		return {cols:[contact,{ $subview:true }]};
+		return {cols: [contact, {$subview: true}]};
 			
 	}
 
 	init(view){
 		var list = view.queryView({view:"list"});
-		list.parse(getUsers());
+		list.parse(users);
 
-		getUsers().waitData.then(function(){
-			
-				list.select(list.getFirstId());
-			
-		});
-		
-		
+		users.waitData.then(function(){
+			list.select(list.getFirstId());
+		});	
 	}
 
 }
