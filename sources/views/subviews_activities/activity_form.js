@@ -3,14 +3,10 @@ import {types} from "models/types";
 import {users} from "models/users";
 import {setActivities, getActivity} from "models/activities";
 
-
-export default class SaveActivity extends JetView{
-
+export default class SaveActivity extends JetView {
 	config() {
-
 		const form = {
 			view: "form",
-			id: "activityForm",
 			width: 420,
 			bordeless: true,
 			elements: [
@@ -41,10 +37,22 @@ export default class SaveActivity extends JetView{
 				{label: "Completed", name: "State", view: "checkbox", width: 120, labelWidth: 100, checkValue: "Close", uncheckValue: "Open"},
 
 				{cols: [
-					{view: "button", type: "iconButton", icon: "plus", label: "Add (*save)", click: saveForm},
-					{view: "button", type: "iconButton", icon: "edit", label: "Cancel", click: function(){
-						this.getTopParentView().hide();
-					}}
+					{
+						view: "button",
+						type: "iconButton",
+						icon: "plus",
+						label: "Add (*save)",
+						click: function () { this.$scope.saveForm(); }
+					},
+					{
+						view: "button",
+						type: "iconButton",
+						icon: "close",
+						label: "Cancel",
+						click: function () {
+							this.getTopParentView().hide();
+						}
+					}
 				]}
 			],
 			rules: {
@@ -59,30 +67,33 @@ export default class SaveActivity extends JetView{
 			position: "center",
 			modal: true,
 			head: "Add (*edit) activity",
-			body: form
+			body: form,
+			on: {
+				onHide: () => {
+					this.getRoot().queryView({view: "form"}).clear();
+					this.getRoot().queryView({view: "form"}).clearValidation();
+				}
+			}
 		};
-
 		return popup;
-
 	}
 
-	showWindow(id) {
+	showWindow(id, type) {
 		this.getRoot().show();
-		if (id) {
-			$$("activityForm").setValues(getActivity(id));
-		}else{
-			$$("activityForm").clear();
+		if (type === "user" && id) {
+			this.getRoot().queryView({view: "form"}).elements.ContactID.setValue(id);
+		}
+		else if (id) {
+			this.getRoot().queryView({view: "form"}).setValues(getActivity(id));
 		}
 	}
 
-}
-
-
-function saveForm() {
-	if ($$("activityForm").validate()) {
-		webix.message("Data entered correctly");
-		const takenData = $$("activityForm").getValues();
-		setActivities(takenData.id, takenData);
-		this.getTopParentView().hide();
+	saveForm() {
+		if (this.getRoot().queryView({view: "form"}).validate()) {
+			webix.message("Data entered correctly");
+			const takenData = this.getRoot().queryView({view: "form"}).getValues();
+			setActivities(takenData.id, takenData);
+			this.getRoot().hide();
+		}
 	}
 }

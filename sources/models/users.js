@@ -3,27 +3,24 @@ export const users = new webix.DataCollection({
 	save: "rest->http://localhost:8096/api/v1/contacts/"
 });
 
-export function setUsers(id, data){ 
-	if (!id){users.add(data);}
-	else{users.updateItem(id, data);}
+export function setUsers(id, data) {
+	if (!id) {
+		users.add(data);
+	}
+	else {
+		users.updateItem(id, data);
+	}
 }
 
-export function getOptionsUsers()
-{
-	return users.waitData.then(function()
-	{
-		var options = [];	
-	users.data.each
-	(
-			function(obj)
-		{
-			options.push(
-				{
-					id:obj.id,
-					value:(obj.FirstName || obj.Email)
-				});
-			}
-		)
+export function getOptionsUsers() {
+	return users.waitData.then(function() {
+		let options = [];
+		users.data.each (function (obj) {
+			options.push({
+				id: obj.id,
+				value: (obj.FirstName || obj.Email)
+			});
+		});
 		return options;
-	})
+	});
 }

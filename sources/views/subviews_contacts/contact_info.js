@@ -1,34 +1,32 @@
 import {JetView} from "webix-jet";
 import {users} from "models/users";
 import {statuses} from "models/statuses";
+import ContactTabView from "views/subviews_contacts/contact_tab_view";
 
-export default class ContactForm extends JetView{
-
-	config(){
-		var count = 0;
-		var userCard = {
-			view: "template", borderless: true, id: "userInfo",
-
-			template: function(item){
-
-				var info = "<h1 class='name'>" + item.FirstName + " " + item.LastName + "</h1>" +
+export default class ContactForm extends JetView {
+	config() {
+		let count = 0;
+		const userCard = {
+			view: "template",
+			height: 250,
+			borderless: true,
+			id: "userInfo",
+			template: function(item) {
+				let info = "<h1 class='name'>" + item.FirstName + " " + item.LastName + "</h1>" +
 				"<div class='info_user'><div  style='background:grey; height:160px;'></div><p class='center'></p></div>" +
 				"<div class='info_user'>";
-
-				
 				function addDiv() {
 					if (count === 4) {
-						info+= "</div><div class='info_user'>";
+						info += "</div><div class='info_user'>";
 					}
 					count++;
 				}
 				function addInfo(icon, value) {
 					if (value) {
 						addDiv();
-						info+= "<span class ='icons webix_icon fa-" + icon + "'></span>" + value + "<br>";					
+						info += "<span class ='icons webix_icon fa-" + icon + "'></span>" + value + "<br>";
 					}
 				}
-
 
 				addInfo("envelope", item.Email);
 
@@ -43,49 +41,58 @@ export default class ContactForm extends JetView{
 				addInfo("map-marker", item.Address);
 
 
-				info+= "</div>";
+				info += "</div>";
 
 				return info;
 			}
 
 		};
 
-		var userButtons = {
+		const userButtons = {
 			view: "layout",
-			cols:[
+			cols: [
 				{view: "button", label: "Delete", type: "iconButton", icon: "trash", css: "webix_icon user_button", autowidth: true},
-				{view: "button", label: "Edit", type: "iconButton", icon: "edit", css: "webix_icon user_button", autowidth: true}
+				{
+					view: "button",
+					label: "Edit",
+					type: "iconButton",
+					icon: "edit",
+					css: "webix_icon user_button",
+					autowidth: true,
+					click: () => {
+						let id = users.getCursor();
+						this.show("subviews_contacts.contact_save?id=" + id);
+					}
+				}
 			]
 		};
 
-		var status = {
-				view: "template", borderless: true, id: "statusInfo", template: function(item){ return "Status: " + item.Icon + ""; }
+		const status = {
+			view: "template", autoheight: true, borderless: true, id: "statusInfo", template: function (item) { return "Status: " + item.Icon + ""; }
 		};
 
-		return {cols:[
-			{rows:[userCard, status,{}]},
-			{rows:[userButtons, {}]}
-		]};
-
+		return {
+			rows: [
+				{cols: [
+					{rows: [userCard, status]},
+					{rows: [userButtons, {}]}
+				]},
+				ContactTabView
+			]
+		};
 	}
-
 	urlChange(view, url) {
 		if (url[0].params.id) {
-			var id  = url[0].params.id;
+			const id = url[0].params.id;
 
 			const a = users.waitData;
 			const b = statuses.waitData;
 
-			webix.promise.all([a, b]).then(function(){
+			webix.promise.all([a, b]).then(function () {
 				let user = users.getItem(id);
 				view.queryView({id: "userInfo"}).parse(user);
-				view.queryView({id: "statusInfo"}).parse(statuses.getItem(user.StatusID+1));
+				view.queryView({id: "statusInfo"}).parse(statuses.getItem(user.StatusID + 1));
 			});
-
-
-			
-			
 		}
 	}
-
 }

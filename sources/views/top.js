@@ -2,12 +2,11 @@ import {JetView, plugins} from "webix-jet";
 
 export default class TopView extends JetView {
 	config() {
-
-		var header = {
+		const header = {
 			type: "header", template: "this.app.config.name"
 		};
 
-		var menu = {
+		const menu = {
 			view: "menu",
 			id: "top:menu",
 			width: 180,
@@ -21,7 +20,7 @@ export default class TopView extends JetView {
 			]
 		};
 
-		var ui = {
+		const ui = {
 			type: "line",
 			cols: [
 				{type: "clean",
@@ -38,14 +37,12 @@ export default class TopView extends JetView {
 
 		return {rows: [header, ui]};
 	}
-	init(view) {
+	init() {
 		this.use(plugins.Menu, "top:menu");
-		//view.queryView({view: "menu"}).select(view.getFirstId());
 	}
 
 	urlChange(view, url) {
 		view.queryView({type: "header"}).config.template = webix.template(url[1].page);
 		view.queryView({type: "header"}).refresh();
 	}
-
 }

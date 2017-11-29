@@ -1,12 +1,12 @@
 import {JetView} from "webix-jet";
 import {activities} from "models/activities";
-import {getOptionsUsers} from "models/users";
+import {getOptionsUsers, users} from "models/users";
 import {getOptionsTypes} from "models/types";
 import SaveActivity from "views/subviews_activities/activity_form";
 
-export default class ActivitiesTable extends JetView {
+export default class ContactActivities extends JetView {
 	config() {
-		const activitiesButton = {
+		const contactAddActivityButton = {
 			view: "layout",
 			cols: [
 				{},
@@ -17,7 +17,10 @@ export default class ActivitiesTable extends JetView {
 					icon: "plus-circle",
 					css: "webix_icon user_button",
 					autowidth: true,
-					click: () => this.SaveActivity.showWindow()
+					click: () => {
+						let id = users.getCursor();
+						this.SaveActivity.showWindow(id, "user");
+					}
 				}
 			]
 		};
@@ -30,10 +33,9 @@ export default class ActivitiesTable extends JetView {
 			editaction: "dblclick",
 			columns: [
 				{header: "Completed", id: "State", template: "{common.checkbox()}", editor: "checkbox", checkValue: "Close", uncheckValue: "Open"},
-				{id: "TypeID", editor: "richselect", header: ["Activity type", {content: "selectFilter"}], sort: "string", width: 190},
-				{id: "DueDate", editor: "text",	header: ["Due date", {content: "textFilter"}], sort: "date", width: 260},
+				{id: "TypeID", editor: "richselect", header: ["Activity type", {content: "selectFilter"}], sort: "string", width: 160},
+				{id: "DueDate", editor: "text",	header: ["Due date", {content: "textFilter"}], sort: "date", width: 220},
 				{id: "Details", editor: "text",	header: ["Details", {content: "textFilter"}], sort: "string", fillspace: true},
-				{id: "ContactID", editor: "richselect", header: ["Contact", {content: "selectFilter"}], sort: "string", width: 190},
 				{header: "Edit", template: "<span class ='webix_icon fa-edit'></span>"},
 				{header: "Del", template: "{common.trashIcon()}"}
 			],
@@ -45,7 +47,7 @@ export default class ActivitiesTable extends JetView {
 						cancel: "Cancel",
 						callback: (res) => {
 							if (res) {
-								activities().remove(id);
+								activities.remove(id);
 							}
 						}
 					});
@@ -55,7 +57,10 @@ export default class ActivitiesTable extends JetView {
 				}
 			}
 		};
-		return {rows: [activitiesButton, activitiesTable]};
+
+		return {rows: [
+			activitiesTable, contactAddActivityButton
+		]};
 	}
 
 	init(view) {
@@ -72,5 +77,27 @@ export default class ActivitiesTable extends JetView {
 		});
 
 		this.SaveActivity = this.ui(SaveActivity);
+	}
+
+	urlChange(view, url) {
+		if (url[0].params.id) {
+			const id = url[0].params.id;
+
+			if (this._ev) {
+				view.queryView({view: "datatable"}).data.detachEvent(this._ev);
+			}
+			this._ev = view.queryView({view: "datatable"}).data.attachEvent("onAfterFilter", function () {
+				this.blockEvent();
+				this.filter("#ContactID#", id, true);
+				this.unblockEvent();
+			});
+
+
+			$$("activitiesTable").data.sync(activities, function () {
+				this.filter(function (item) {
+					return item.ContactID == id;
+				});
+			});
+		}
 	}
 }
