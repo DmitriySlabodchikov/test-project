@@ -22,7 +22,6 @@ export default class SaveActivity extends JetView {
 					}
 				},
 				{view: "richselect",
-					id: "",
 					label: "Contact",
 					name: "ContactID",
 					options: {

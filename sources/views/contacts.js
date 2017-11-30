@@ -31,7 +31,7 @@ export default class ContactList extends JetView {
 			on: {
 				onAfterSelect: (id) => {
 					users.setCursor(id);
-					this.show("subviews_contacts.contact_info?id=" + id);
+					this.show(`subviews_contacts.contact_info?id=${id}`);
 				}
 			}
 		};

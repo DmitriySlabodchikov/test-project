@@ -8,7 +8,7 @@ export default class ContactTabView extends JetView {
 			cells: [
 				{
 					header: "Activities",
-					body: {rows: [ContactActivities, {view: "template", autoheight: true}]}
+					body: {rows: [ContactActivities]}
 				},
 				{
 					header: "Files",

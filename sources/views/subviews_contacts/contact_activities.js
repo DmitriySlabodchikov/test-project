@@ -64,16 +64,18 @@ export default class ContactActivities extends JetView {
 	}
 
 	init(view) {
-		view.queryView({view: "datatable"}).parse(activities);
+		const table = view.queryView({view: "datatable"});
+
+		table.parse(activities);
 
 		getOptionsUsers().then(function (opts) {
-			$$("activitiesTable").getColumnConfig("ContactID").collection = opts;
-			$$("activitiesTable").refreshColumns();
+			table.getColumnConfig("ContactID").collection = opts;
+			table.refreshColumns();
 		});
 
 		getOptionsTypes().then(function (opts) {
-			$$("activitiesTable").getColumnConfig("TypeID").collection = opts;
-			$$("activitiesTable").refreshColumns();
+			table.getColumnConfig("TypeID").collection = opts;
+			table.refreshColumns();
 		});
 
 		this.SaveActivity = this.ui(SaveActivity);

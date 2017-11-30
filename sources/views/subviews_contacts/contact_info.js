@@ -5,18 +5,18 @@ import ContactTabView from "views/subviews_contacts/contact_tab_view";
 
 export default class ContactForm extends JetView {
 	config() {
-		let count = 0;
 		const userCard = {
 			view: "template",
 			height: 250,
 			borderless: true,
 			id: "userInfo",
-			template: function(item) {
-				let info = "<h1 class='name'>" + item.FirstName + " " + item.LastName + "</h1>" +
-				"<div class='info_user'><div  style='background:grey; height:160px;'></div><p class='center'></p></div>" +
-				"<div class='info_user'>";
+			template: function (item) {
+				let count = 0;
+				let info = `<h1 class='name'>${item.FirstName} ${item.LastName}</h1>
+				<div class='info_user'><div  style='background:grey; height:160px;'></div><p class='center'></p></div>
+				<div class='info_user'>`;
 				function addDiv() {
-					if (count === 4) {
+					if (count % 4 === 0) {
 						info += "</div><div class='info_user'>";
 					}
 					count++;
@@ -24,7 +24,7 @@ export default class ContactForm extends JetView {
 				function addInfo(icon, value) {
 					if (value) {
 						addDiv();
-						info += "<span class ='icons webix_icon fa-" + icon + "'></span>" + value + "<br>";
+						info += `<span class ='icons webix_icon fa-${icon}'></span>${value}<br>`;
 					}
 				}
 
@@ -51,7 +51,29 @@ export default class ContactForm extends JetView {
 		const userButtons = {
 			view: "layout",
 			cols: [
-				{view: "button", label: "Delete", type: "iconButton", icon: "trash", css: "webix_icon user_button", autowidth: true},
+				{
+					view: "button",
+					label: "Delete",
+					type: "iconButton",
+					icon: "trash",
+					css: "webix_icon user_button",
+					autowidth: true,
+					click: () => {
+						webix.confirm({
+							text: "This user will be deleted. <br/> Are you sure?",
+							ok: "Yes",
+							cancel: "Cancel",
+							callback: (res) => {
+								if (res) {
+									let id = users.getCursor();
+									users.remove(id);
+									id = users.getFirstId();
+									this.show(`subviews_contacts.contact_info?id=${id}`);
+								}
+							}
+						});
+					}
+				},
 				{
 					view: "button",
 					label: "Edit",
@@ -61,14 +83,14 @@ export default class ContactForm extends JetView {
 					autowidth: true,
 					click: () => {
 						let id = users.getCursor();
-						this.show("subviews_contacts.contact_save?id=" + id);
+						this.show(`subviews_contacts.contact_save?id=${id}`);
 					}
 				}
 			]
 		};
 
 		const status = {
-			view: "template", autoheight: true, borderless: true, id: "statusInfo", template: function (item) { return "Status: " + item.Icon + ""; }
+			view: "template", autoheight: true, borderless: true, id: "statusInfo", template: function (item) { return `Status: ${item.Icon}`; }
 		};
 
 		return {
@@ -91,7 +113,7 @@ export default class ContactForm extends JetView {
 			webix.promise.all([a, b]).then(function () {
 				let user = users.getItem(id);
 				view.queryView({id: "userInfo"}).parse(user);
-				view.queryView({id: "statusInfo"}).parse(statuses.getItem(user.StatusID + 1));
+				view.queryView({id: "statusInfo"}).parse(statuses.getItem(user.StatusID));
 			});
 		}
 	}

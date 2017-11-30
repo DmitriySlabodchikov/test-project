@@ -1,11 +1,11 @@
 import {JetView} from "webix-jet";
-import {users} from "models/users";
+import {users, getUser, setUsers} from "models/users";
+import {statuses} from "models/statuses";
 
 export default class ContactForm extends JetView {
 	config() {
 		const userForm = {
 			view: "form",
-
 			borderless: true,
 			elements: [
 				{cols: [
@@ -13,7 +13,16 @@ export default class ContactForm extends JetView {
 						{view: "text", label: "First Name", name: "FirstName"},
 						{view: "text", label: "Last Name", name: "LastName"},
 						{view: "datepicker", label: "Joining date", name: "StartDate", format: "%d-%m-%Y", stringResult: true},
-						{view: "text", label: "Status", name: "Status"},
+						{view: "richselect",
+							label: "Status",
+							name: "StatusID",
+							options: {
+								data: statuses,
+								body: {
+									template: "#Icon#"
+								}
+							}
+						},
 						{view: "text", label: "Job", name: "Job"},
 						{view: "text", label: "Company", name: "Company"},
 						{view: "text", label: "Website", name: "Website"},
@@ -32,12 +41,13 @@ export default class ContactForm extends JetView {
 					{
 						view: "button",
 						type: "iconButton",
-						icon: "edit",
+						icon: "close",
 						css: "webix_icon user_button",
 						autowidth: true,
 						label: "Cancel",
-						click: function() {
-							this.getTopParentView().hide();
+						click: function () {
+							//let id = users.getCursor();
+							//this.show(`subviews_contacts.contact_info?id=${id}`);
 						}
 					},
 					{
@@ -47,16 +57,40 @@ export default class ContactForm extends JetView {
 						css: "webix_icon user_button",
 						autowidth: true,
 						label: "Add (*save)",
-						click: function() { this.$scope.saveForm(); }
+						click: function () { this.$scope.saveForm(); }
 					}
 				]}
 			],
+			elementsConfig: {
+				labelWidth: 100
+			},
 			rules: {
-				TypeID: webix.rules.isNotEmpty,
-				ContactID: webix.rules.isNotEmpty
+				StatusID: webix.rules.isNotEmpty
 			}
 		};
-
 		return {rows: [userForm, {borderless: true}]};
+	}
+	urlChange(view, url) {
+		if (url[0].params.id) {
+			const id = url[0].params.id;
+			if (id) {
+				this.getRoot().queryView({view: "form"}).setValues(getUser(id));
+			}
+		}
+	}
+	saveForm() {
+		if (this.getRoot().queryView({view: "form"}).validate()) {
+			webix.message("Data entered correctly");
+			const takenData = this.getRoot().queryView({view: "form"}).getValues();
+			console.log(takenData.id);
+			setUsers(takenData.id, takenData);
+			let id = takenData.id || users.getLastId();
+			if (id === users.getLastId()) {
+				$$("contactlist").select(id);
+			}
+			else {
+				this.show(`subviews_contacts.contact_info?id=${id}`);
+			}
+		}
 	}
 }
