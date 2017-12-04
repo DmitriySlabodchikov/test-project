@@ -39,24 +39,12 @@ export default class ActivitiesTable extends JetView {
 			columns: [
 				{header: "Completed", id: "State", template: "{common.checkbox()}", editor: "checkbox", checkValue: "Close", uncheckValue: "Open"},
 				{id: "TypeID", editor: "richselect", header: ["Activity type", {content: "selectFilter"}], sort: "string", width: 190},
-				{id: "DueDate", editor: "text",	header: ["Due date", {content: "textFilter"}], sort: "date", width: 260},
+				{id: "DueDate", format: webix.i18n.dateFormatStr, editor: "text",	header: ["Due date", {content: "textFilter"}], sort: "date", width: 260},
 				{id: "Details", editor: "text",	header: ["Details", {content: "textFilter"}], sort: "string", fillspace: true},
 				{id: "ContactID", editor: "richselect", header: ["Contact", {content: "selectFilter"}], sort: "string", width: 190},
 				{header: "Edit", template: "<span class ='webix_icon fa-edit'></span>"},
 				{header: "Del", template: "{common.trashIcon()}"}
 			],
-			scheme: {
-				$init: function (obj) {
-					if (obj.DueDate) {
-						obj.DueDate = webix.i18n.parseFormatDate(obj.DueDate);
-					}
-				},
-				$save: function (obj) {
-					if (obj.DueDate) {
-						obj.DueDate = webix.i18n.parseFormatStr(obj.DueDate);
-					}
-				}
-			},
 			onClick: {
 				"fa-trash": (ev, id) => {
 					webix.confirm({
@@ -100,17 +88,7 @@ export default class ActivitiesTable extends JetView {
 		const value = this.getRoot().queryView({view: "segmented"}).getValue();
 		const datatable = $$("activitiesTable");
 		const date = new Date();
-		Date.prototype.getWeek = function () {
-			const now = new Date(this.getTime());
-			now.setHours(0, 0, 0, 0);
-			// Thursday in current week decides the year.
-			now.setDate(now.getDate() + 3 - (now.getDay() + 6) % 7);
-			// January 4 is always in week 1.
-			const week1 = new Date(now.getFullYear(), 0, 4);
-			// Adjust to Thursday in week 1 and count number of weeks from now to week1.
-			return 1 + Math.round(((now.getTime() - week1.getTime()) / 86400000
-			- 3 + (week1.getDay() + 6) % 7) / 7);
-		};
+		let today = webix.Date.datePart(date);
 
 		switch (value) {
 			default:
@@ -120,7 +98,7 @@ export default class ActivitiesTable extends JetView {
 				break;
 			case "2":
 				datatable.filter(function (item) {
-					return date > webix.i18n.parseFormatDate(item.DueDate);
+					return today > item.DueDate;
 				});
 				break;
 			case "3":
@@ -130,29 +108,31 @@ export default class ActivitiesTable extends JetView {
 				break;
 			case "4":
 				datatable.filter(function (item) {
-					const today = ("0" + date.getDate()).slice(-2) + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + date.getFullYear();
-					return today === item.DueDate;
+					if (webix.Date.equal(item.DueDate, today)) {
+						return item;
+					}
 				});
 				break;
 			case "5":
 				datatable.filter(function (item) {
-					debugger
-					const tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-					return (tomorrow.getDate() === webix.i18n.parseFormatDate(item.DueDate).getDate() &&
-						tomorrow.getMonth() === webix.i18n.parseFormatDate(item.DueDate).getMonth() &&
-						tomorrow.getFullYear() === webix.i18n.parseFormatDate(item.DueDate).getFullYear());
+					let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+					tomorrow = webix.Date.datePart(tomorrow);
+					return (tomorrow.getDate() === item.DueDate.getDate() &&
+						tomorrow.getMonth() === item.DueDate.getMonth() &&
+						tomorrow.getFullYear() === item.DueDate.getFullYear());
 				});
 				break;
 			case "6":
 				datatable.filter(function (item) {
-					debugger
-					return date.getWeek() === webix.i18n.parseFormatDate(item.DueDate).getWeek();
+					if (webix.Date.equal(webix.Date.weekStart(item.DueDate), webix.Date.weekStart(today))) {
+						return item;
+					}
 				});
 				break;
 			case "7":
 				datatable.filter(function (item) {
-					return (date.getMonth() === webix.i18n.parseFormatDate(item.DueDate).getMonth() &&
-					date.getFullYear() === webix.i18n.parseFormatDate(item.DueDate).getFullYear());
+					return (today.getMonth() === item.DueDate.getMonth() &&
+					today.getFullYear() === item.DueDate.getFullYear());
 				});
 				break;
 		}
