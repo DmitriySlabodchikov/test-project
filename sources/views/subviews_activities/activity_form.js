@@ -65,7 +65,7 @@ export default class SaveActivity extends JetView {
 			width: 300,
 			position: "center",
 			modal: true,
-			head: "Add (*edit) activity",
+			head: {view: "template", type: "header"},
 			body: form,
 			on: {
 				onHide: () => {
@@ -79,15 +79,25 @@ export default class SaveActivity extends JetView {
 
 	showWindow(id, type) {
 		this.getRoot().show();
-		/*if (id) {
-			this.getRoot().queryView({icon: "plus"}).define("label", "Save");
-			this.getRoot().queryView({icon: "plus"}).refresh();
-		}*/
-		if (type === "user" && id) {
-			this.getRoot().queryView({view: "form"}).elements.ContactID.setValue(id);
+		const labelEdit = this.getRoot().queryView({icon: "plus"});
+		const headEdit = this.getRoot().queryView({type: "header"});
+		if (id) {
+			labelEdit.define("label", "Save");
+			labelEdit.refresh();
+			headEdit.define("template", "Edit");
+			headEdit.refresh();
+			if (type === "user") {
+				this.getRoot().queryView({view: "form"}).elements.ContactID.setValue(id);
+			}
+			else {
+				this.getRoot().queryView({view: "form"}).setValues(getActivity(id));
+			}
 		}
-		else if (id) {
-			this.getRoot().queryView({view: "form"}).setValues(getActivity(id));
+		else {
+			labelEdit.define("label", "Add");
+			labelEdit.refresh();
+			headEdit.define("template", "Add");
+			headEdit.refresh();
 		}
 	}
 
