@@ -15,7 +15,7 @@ export default class ActivityTypes extends JetView {
 					css: "webix_icon user_button",
 					autowidth: true,
 					click: () => {
-						const takenData = ["", ""];
+						const takenData = {};
 						setActivitytypes(takenData.id, takenData);
 					}
 				}

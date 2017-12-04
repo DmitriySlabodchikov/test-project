@@ -15,7 +15,7 @@ export default class Statuses extends JetView {
 					css: "webix_icon user_button",
 					autowidth: true,
 					click: () => {
-						const takenData = ["", ""];
+						const takenData = {};
 						setStatuses(takenData.id, takenData);
 					}
 				}
